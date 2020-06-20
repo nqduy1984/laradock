@@ -13,6 +13,14 @@ ENV WEB_DOCUMENT_ROOT=${DOCUMENT_ROOT}
 
 ENV WEB_PHP_TIMEOUT=${PHP_UPSTREAM_TIMEOUT}
 
+RUN apt update
+
+RUN a2enmod proxy \
+&& a2enmod proxy_http \
+&& a2enmod ssl \
+&& a2enmod rewrite \
+&& service apache2 stop
+
 EXPOSE 80 443
 
 WORKDIR /var/www/

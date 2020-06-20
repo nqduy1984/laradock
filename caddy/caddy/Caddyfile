@@ -1,51 +1,143 @@
 # Docs: https://caddyserver.com/docs/caddyfile
 0.0.0.0:80 {
-    root /var/www/public
+    root /var/www/phpsysinfo
     fastcgi / php-fpm:9000 php {
         index index.php
     }
 
-    # To handle .html extensions with laravel change ext to
-    # ext / .html
-
-    rewrite {
-        to {path} {path}/ /index.php?{query}
+    proxy /phpmyadmin/ phpmyadmin:80 {
+        without /phpmyadmin/
+        transparent
     }
+
     gzip
     browse
     log /var/log/caddy/access.log
     errors /var/log/caddy/error.log
-    # Uncomment to enable TLS (HTTPS)
-    # Change the first list to listen on port 443 when enabling TLS
-    #tls self_signed
+}
+#######################################################################
+https://worktime.duynq.icd {
+    root /var/www/PHP/icd/worktime.duynq.icd/public
 
-    # To use Lets encrpt tls with a DNS provider uncomment these
-    # lines and change the provider as required
-    #tls {
-    #  dns cloudflare
-    #}
+    gzip
+    browse
+
+    fastcgi / php-fpm:9000 php {
+        index index.php
+    }
+
+    # This rewrite is to prevent access to dot files and folders such
+    # as .htaccess, .git, etc.
+    rewrite {
+        # This regex catches everything that contains "/." in the URL
+        r \/\.
+        if {path} not_starts_with .well-known
+        to /index.php{uri}
+    }
+
+    # Rewrite non-existent URLs to our index.php controller
+    rewrite {
+        if {file} not favicon.ico
+        to {path} {path}/ /index.php?{query}
+    }
+
+    header / {
+        Strict-Transport-Security	"max-age=30758400"
+        X-Content-Type-Options		"nosniff"
+        X-Frame-Options			"deny"
+        X-XSS-Protection		"1; mode=block"
+        Referrer-Policy			"same-origin"
+    }
+
+    # Log
+    log /var/log/caddy/worktime.duynq.icd_access.log
+    errors /var/log/caddy/worktime.duynq.icd_error.log
+
+    # SSL Certificates
+    tls /var/www/Server/ssl/_wildcard.duynq.icd.pem /var/www/Server/ssl/_wildcard.duynq.icd-key.pem
 }
 
-laradock1.demo:80 {
-    root /var/www/public
-    # Create a Webhook in git.
-    #git {
-	#repo https://github.com/xxx/xxx
-    #    path /home/xxx
-    #    #interval 60
-    #    hook  webhook laradock
-    #    hook_type   generic
-    #}
+#######################################################################
+https://maplife-bus-route.duynq.icd {
+    root /var/www/PHP/maplife/projects/bus-route/mplf_route/public
 
+    gzip
+    browse
+
+    fastcgi / php-fpm:9000 php {
+        index index.php
+    }
+
+    # This rewrite is to prevent access to dot files and folders such
+    # as .htaccess, .git, etc.
+    rewrite {
+        # This regex catches everything that contains "/." in the URL
+        r \/\.
+        if {path} not_starts_with .well-known
+        to /index.php{uri}
+    }
+
+    # Rewrite non-existent URLs to our index.php controller
+    rewrite {
+        if {file} not favicon.ico
+        to {path} {path}/ /index.php?{query}
+    }
+
+    header / {
+        Strict-Transport-Security	"max-age=30758400"
+        X-Content-Type-Options		"nosniff"
+        X-Frame-Options			"deny"
+        X-XSS-Protection		"1; mode=block"
+        Referrer-Policy			"same-origin"
+    }
+
+    # Log
+    log /var/log/caddy/maplife-bus-route.duynq.icd_access.log
+    errors /var/log/caddy/maplife-bus-route.duynq.icd_error.log
+
+    # SSL Certificates
+    tls /var/www/Server/ssl/_wildcard.duynq.icd.pem /var/www/Server/ssl/_wildcard.duynq.icd-key.pem
 }
 
-laradock2.demo:80 {
-    # Create a Proxy and cors.
-    #proxy domain.com
-	#cors
+#######################################################################
+https://laravel-admin.duynq.icd {
+    root /var/www/PHP/personal/laravel-admin.duynq.icd/public
+
+    gzip
+    browse
+
+    fastcgi / php-fpm:9000 php {
+        index index.php
+    }
+
+    # This rewrite is to prevent access to dot files and folders such
+    # as .htaccess, .git, etc.
+    rewrite {
+        # This regex catches everything that contains "/." in the URL
+        r \/\.
+        if {path} not_starts_with .well-known
+        to /index.php{uri}
+    }
+
+    # Rewrite non-existent URLs to our index.php controller
+    rewrite {
+        if {file} not favicon.ico
+        to {path} {path}/ /index.php?{query}
+    }
+
+    header / {
+        Strict-Transport-Security	"max-age=30758400"
+        X-Content-Type-Options		"nosniff"
+        X-Frame-Options			"deny"
+        X-XSS-Protection		"1; mode=block"
+        Referrer-Policy			"same-origin"
+    }
+
+    # Log
+    log /var/log/caddy/laravel-admin.duynq.icd.duynq.icd_access.log
+    errors /var/log/caddy/laravel-admin.duynq.icd.duynq.icd_error.log
+
+    # SSL Certificates
+    tls /var/www/Server/ssl/_wildcard.duynq.icd.pem /var/www/Server/ssl/_wildcard.duynq.icd-key.pem
 }
 
-laradock3.demo:80 {
-    import authlist.conf
-    root /var/www/public
-}
